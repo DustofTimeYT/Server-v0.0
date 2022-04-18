@@ -1,8 +1,8 @@
 ﻿@model Server_v0._0.Models.Order
 @{
-    ViewBag.Title = "Добавление пользователя";
+    ViewBag.Title = "Добавить заказ";
 }
-<form asp-action="create" asp-controller="home">
+<form asp-action="create" asp-controller="OrdersController">
     <div class="form-group">
         <label asp-for="Price" class="control-label">Цена заказа</label>
         <input type="number" asp-for="Price" class="form-control" />

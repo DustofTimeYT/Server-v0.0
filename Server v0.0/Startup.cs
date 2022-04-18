@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Server_v0._0.Models;
 using System.Diagnostics;
+using System;
+using System.Reflection;
+using System.IO;
 
 namespace Server_v0._0
 {
@@ -21,24 +24,36 @@ namespace Server_v0._0
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // получаем строку подключения из файла конфигурации
+            services.AddSwaggerGen();
+
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            // добавляем контекст ApplicationContext в качестве сервиса в приложение
+
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
             services.AddControllersWithViews();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseSwagger(c =>
+            {
+                c.SerializeAsV2 = true;
+            });
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Clients/Error");
+                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -49,11 +64,11 @@ namespace Server_v0._0
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "MyArea",
-                    pattern: "{area:exists}/{controller=Orders}/{action=Index}/{id?}");
-                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Clients}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "MyArea",
+                    pattern: "{controller=Orders}/{action=Index}/{id?}");
             });
         }
     }
